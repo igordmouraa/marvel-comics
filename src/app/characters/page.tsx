@@ -7,11 +7,21 @@ import { getMarvelCharacters } from "../../services/api";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
+// Definindo uma interface para o personagem
+interface Character {
+  id: number;
+  name: string;
+  description?: string;
+  thumbnail: {
+    path: string;
+    extension: string;
+  };
+}
+
 const LIMIT = 10;
 
 export default function CharactersPage() {
-  const [characters, setCharacters] = useState<any[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [characters, setCharacters] = useState<Character[]>([]);
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -28,8 +38,8 @@ export default function CharactersPage() {
       }
     };
 
-    fetchCharacters(searchTerm || "avengers");
-  }, [searchTerm, offset]);
+    fetchCharacters("avengers");
+  }, [offset]);
 
   // Funções de paginação
   const handleNextPage = () => {

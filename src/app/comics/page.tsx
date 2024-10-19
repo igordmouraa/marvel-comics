@@ -6,12 +6,20 @@ import Image from "next/image";
 import { getMarvelComics } from "../../services/api";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+interface Comic {
+  id: number;
+  title: string;
+  description?: string;
+  thumbnail: {
+    path: string;
+    extension: string;
+  };
+}
 
 const LIMIT = 10;
 
 export default function ComicsPage() {
-  const [comics, setComics] = useState<any[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [comics, setComics] = useState<Comic[]>([]);
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -28,9 +36,8 @@ export default function ComicsPage() {
       }
     };
 
-    fetchComics(searchTerm || "avengers");
-  }, [searchTerm, offset]);
-
+    fetchComics("avengers");
+  }, [offset]);
 
   // Funções de paginação
   const handleNextPage = () => {

@@ -7,10 +7,21 @@ import { getMarvelEvents } from "../../services/api";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
+// Definindo uma interface para o evento
+interface Event {
+  id: number;
+  title: string;
+  description?: string;
+  thumbnail: {
+    path: string;
+    extension: string;
+  };
+}
+
 const LIMIT = 10;
 
 export default function EventsPage() {
-  const [events, setEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [offset, setOffset] = useState(0);
 

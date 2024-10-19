@@ -1,16 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import Image from 'next/image';
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { getMarvelComics } from "../services/api";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator"; // Certifique-se de importar o Separator
+
+// Definindo uma interface para os quadrinhos
+interface Comic {
+  id: number;
+  title: string;
+  description?: string;
+  thumbnail: {
+    path: string;
+    extension: string;
+  };
+}
 
 const LIMIT = 3;
 
 export default function HomePage() {
-  const [comics, setComics] = useState<any[]>([]);
+  const [comics, setComics] = useState<Comic[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -45,6 +57,8 @@ export default function HomePage() {
         </Link>
       </div>
 
+      <Separator className="my-10" /> {/* Separator adicionado */}
+
       {/* Features Section */}
       <div className="max-w-7xl mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold text-center mb-8">Por que escolher a Marvel?</h2>
@@ -64,6 +78,8 @@ export default function HomePage() {
         </div>
       </div>
 
+      <Separator className="my-10" /> {/* Separator adicionado */}
+
       {/* Comics Section */}
       <main className="max-w-7xl mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold text-center mb-8">Quadrinhos em Destaque</h2>
@@ -77,8 +93,8 @@ export default function HomePage() {
                   src={`${comic.thumbnail.path}.${comic.thumbnail.extension}`}
                   alt={comic.title}
                   className="rounded-t-lg"
-                  width={300} // Defina a largura da imagem
-                  height={450} // Defina a altura da imagem
+                  width={300}
+                  height={450}
                   objectFit="cover" 
                 />
                 <div className="p-4">
@@ -96,20 +112,24 @@ export default function HomePage() {
         )}
       </main>
 
+      <Separator className="my-10" /> {/* Separator adicionado */}
+
       {/* Testimonials Section */}
       <div className="mx-auto max-w-5xl px-4 py-16">
         <h2 className="text-3xl font-bold text-center mb-8">O que nossos fãs dizem</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="bg-white rounded-lg shadow-lg p-6">
             <h3 className="font-semibold">Cliente Satisfeito</h3>
-            <p className="text-gray-600 mb-4">"A Marvel sempre traz histórias que me emocionam e me fazem sonhar!"</p>
+            <p className="text-gray-600 mb-4">&quot;A Marvel sempre traz histórias que me emocionam e me fazem sonhar!&quot;</p>
           </div>
           <div className="bg-white rounded-lg shadow-lg p-6">
             <h3 className="font-semibold">Outro Fã Feliz</h3>
-            <p className="text-gray-600 mb-4">"Os quadrinhos da Marvel são a minha forma favorita de entretenimento!"</p>
+            <p className="text-gray-600 mb-4">&quot;Os quadrinhos da Marvel são a minha forma favorita de entretenimento!&quot;</p>
           </div>
         </div>
       </div>
+
+      <Separator className="my-10" /> {/* Separator adicionado */}
 
       {/* Footer Section */}
       <footer className="mt-10 text-center">
