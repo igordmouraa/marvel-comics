@@ -1,4 +1,5 @@
-import { getCharacterDetails } from "../../../services/api"; // Importa a função para buscar detalhes do personagem
+import { getCharacterDetails } from "../../../services/api";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 
 interface CharacterPageProps {
@@ -9,37 +10,39 @@ export default async function CharacterPage({ params }: CharacterPageProps) {
   console.log("Componente CharacterPage foi renderizado");
   console.log("Parâmetros recebidos:", params);
 
-  let characterData; // Definido fora do try-catch
+  let characterData;
 
   try {
     const character = await getCharacterDetails(params.id);
     console.log("ID do personagem:", params.id);
-    console.log("Dados do personagem:", character); // Verifique se os dados estão corretos
+    console.log("Dados do personagem:", character);
 
     if (!character.data || !character.data.results.length) {
       notFound();
-      return; // Adicionei return para evitar execução adicional
+      return;
     }
 
-    characterData = character.data.results[0]; // Extraindo os dados do personagem
+    characterData = character.data.results[0];
   } catch (error) {
     console.error("Erro ao buscar detalhes do personagem:", error);
-    notFound(); // Chame notFound se houver erro
-    return; // Adicionei return para evitar execução adicional
+    notFound();
+    return;
   }
 
-  // Verifique se characterData está definido antes de renderizar
+  
   if (!characterData) {
-    return <div>Carregando...</div>; // Ou qualquer outro indicador de carregamento
+    return <div>Carregando...</div>;
   }
 
   return (
     <div className="container mx-auto px-4 py-6">
       <h1 className="text-4xl font-bold mb-4 text-center">{characterData.name}</h1>
       <div className="flex flex-col md:flex-row items-center mb-6">
-        <img
+        <Image
           src={`${characterData.thumbnail.path}.${characterData.thumbnail.extension}`}
           alt={characterData.name}
+          width={300}
+          height={400}
           className="w-full md:w-1/3 h-auto object-cover rounded-lg shadow-lg mb-4 md:mb-0 md:mr-4"
         />
         <div className="md:w-2/3 md:ml-4">

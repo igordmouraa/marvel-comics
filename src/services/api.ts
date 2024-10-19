@@ -89,3 +89,39 @@ export const getCharacterDetails = async (id: string) => {
         throw error; // Lança o erro para que possa ser tratado onde a função é chamada
     }
 };
+
+export const getMarvelEvents = async (offset: number = 0, limit: number = 10) => {
+    const { timestamp, hash } = generateAuthParams();
+    const baseUrl = 'https://gateway.marvel.com/v1/public/events';
+    const url = `${baseUrl}?ts=${timestamp}&apikey=${publicKey}&hash=${hash}&offset=${offset}&limit=${limit}`;
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Erro: ${response.status} ${response.statusText}`);
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Erro ao buscar eventos da Marvel:', error);
+        throw error;
+    }
+};
+
+export const getEventDetails = async (id: string) => {
+    const { timestamp, hash } = generateAuthParams();
+    const baseUrl = `https://gateway.marvel.com/v1/public/events/${id}`;
+    const url = `${baseUrl}?ts=${timestamp}&apikey=${publicKey}&hash=${hash}`;
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Erro: ${response.status} ${response.statusText}`);
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Erro ao buscar detalhes do evento:', error);
+        throw error; // Lança o erro para que possa ser tratado onde a função é chamada
+    }
+};

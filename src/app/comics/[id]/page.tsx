@@ -1,4 +1,5 @@
 import { getComicDetails } from "../../../services/api";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 
 interface ComicPageProps {
@@ -9,36 +10,38 @@ export default async function ComicPage({ params }: ComicPageProps) {
   console.log("Componente ComicPage foi renderizado");
   console.log("Parâmetros recebidos:", params);
 
-  let comicData; // Definido fora do try-catch
+  let comicData;
 
   try {
     const comic = await getComicDetails(params.id);
     
     if (!comic.data || !comic.data.results.length) {
       notFound();
-      return; // Adicionei return para evitar execução adicional
+      return;
     }
 
-    comicData = comic.data.results[0]; // Extraindo os dados do quadrinho
+    comicData = comic.data.results[0];
   } catch (error) {
     console.error("Erro ao buscar detalhes do quadrinho:", error);
-    notFound(); // Chame notFound se houver erro
-    return; // Adicionei return para evitar execução adicional
+    notFound();
+    return;
   }
 
-  // Verifique se comicData está definido antes de renderizar
+
   if (!comicData) {
-    return <div>Carregando...</div>; // Ou qualquer outro indicador de carregamento
+    return <div>Carregando...</div>;
   }
 
   return (
     <div className="container mx-auto px-4 py-6">
       <h1 className="text-4xl font-bold mb-4 text-center">{comicData.title}</h1>
       <div className="flex flex-col md:flex-row mb-6">
-        <img
+        <Image
           src={`${comicData.thumbnail.path}.${comicData.thumbnail.extension}`}
           alt={comicData.title}
-          className="w-full md:w-1/3 h-auto mb-4 md:mb-0 md:mr-4 rounded-lg shadow-lg" // Bordas arredondadas e sombra
+          width={300}
+          height={400}
+          className="w-full md:w-1/3 h-auto mb-4 md:mb-0 md:mr-4 rounded-lg shadow-lg"
         />
         <div className="md:w-2/3 md:ml-4">
           <p className="mb-4 text-gray-700">

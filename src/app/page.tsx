@@ -1,33 +1,33 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getMarvelComics } from "../services/api"; // Certifique-se de que o caminho está correto
+import Image from 'next/image';
+import { useEffect, useState } from "react";
+import { getMarvelComics } from "../services/api";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 
-const LIMIT = 3; // Definindo o limite para 3 quadrinhos
+const LIMIT = 3;
 
 export default function HomePage() {
   const [comics, setComics] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true); // Estado de carregamento
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchComics = async () => {
-      setLoading(true); // Inicia o carregamento
+      setLoading(true);
       try {
-        const data = await getMarvelComics("avengers", 0, LIMIT); // Usando 'avengers' como valor padrão
+        const data = await getMarvelComics("avengers", 0, LIMIT);
         setComics(data.data.results);
       } catch (error) {
         console.error(error);
       } finally {
-        setLoading(false); // Finaliza o carregamento
+        setLoading(false);
       }
     };
 
-    fetchComics(); // Chama a função para buscar os quadrinhos
-  }, []); // A dependência vazia garante que a busca seja feita apenas uma vez ao montar o componente
+    fetchComics();
+  }, []);
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">
@@ -73,10 +73,13 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {comics.map((comic) => (
               <Card key={comic.id} className="rounded-lg shadow-md">
-                <img
+                <Image
                   src={`${comic.thumbnail.path}.${comic.thumbnail.extension}`}
                   alt={comic.title}
-                  className="rounded-t-lg h-48 w-full object-cover"
+                  className="rounded-t-lg"
+                  width={300} // Defina a largura da imagem
+                  height={450} // Defina a altura da imagem
+                  objectFit="cover" 
                 />
                 <div className="p-4">
                   <h3 className="text-xl font-bold">{comic.title}</h3>

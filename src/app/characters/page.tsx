@@ -1,24 +1,26 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { getMarvelCharacters } from '../../services/api';
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { getMarvelCharacters } from "../../services/api";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
-const ITEMS_PER_PAGE = 20; // Número de personagens por página
+const LIMIT = 10;
 
 export default function CharactersPage() {
   const [characters, setCharacters] = useState<any[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalCharacters, setTotalCharacters] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCharacters = async () => {
+    const fetchCharacters = async (term: string) => {
       setLoading(true);
       try {
-        const data = await getMarvelCharacters(currentPage);
+        const data = await getMarvelCharacters(term, offset, LIMIT);
         setCharacters(data.data.results);
-        setTotalCharacters(data.data.total);
       } catch (error) {
         console.error(error);
       } finally {
@@ -26,21 +28,16 @@ export default function CharactersPage() {
       }
     };
 
-    fetchCharacters();
-  }, [currentPage]);
+    fetchCharacters(searchTerm || "avengers");
+  }, [searchTerm, offset]);
 
-  const totalPages = Math.ceil(totalCharacters / ITEMS_PER_PAGE);
-
+  // Funções de paginação
   const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage((prev) => prev + 1);
-    }
+    setOffset((prev) => prev + LIMIT);
   };
 
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage((prev) => prev - 1);
-    }
+  const handlePreviousPage = () => {
+    setOffset((prev) => Math.max(prev - LIMIT, 0));
   };
 
   return (
@@ -51,33 +48,41 @@ export default function CharactersPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {characters.map((character) => (
-            <Link key={character.id} href={`/characters/${character.id}`} passHref>
-              <div className="bg-white shadow-lg rounded-lg overflow-hidden transition-shadow duration-200 hover:shadow-xl">
-                <img
-                  src={`${character.thumbnail.path}.${character.thumbnail.extension}`}
-                  alt={character.name}
-                  className="w-full h-48 object-cover rounded-t-lg" // Tamanho fixo e bordas arredondadas
-                />
-                <div className="p-4">
-                  <h2 className="font-bold text-center">{character.name}</h2>
-                </div>
+            <Card key={character.id} className="rounded-lg shadow-md overflow-hidden transition-shadow duration-200 hover:shadow-xl">
+              <Image
+                src={`${character.thumbnail.path}.${character.thumbnail.extension}`}
+                alt={character.name}
+                width={300}
+                height={400}
+                className="w-full h-48 object-cover rounded-t-lg"
+              />
+              <div className="p-4">
+                <h2 className="text-xl font-bold text-center">{character.name}</h2>
+                <p className="text-gray-600 h-16 overflow-hidden text-ellipsis">
+                  {character.description || "Descrição não disponível."}
+                </p>
+                <Link href={`/characters/${character.id}`} passHref>
+                  <Button variant="outline" className="w-full mt-4 rounded-full">
+                    Saiba Mais
+                  </Button>
+                </Link>
               </div>
-            </Link>
+            </Card>
           ))}
         </div>
       )}
-      <div className="flex justify-between mt-4">
+      <div className="flex justify-between mt-8">
         <button
-          onClick={handlePrevPage}
-          disabled={currentPage === 1}
-          className={`px-4 py-2 ${currentPage === 1 ? 'bg-gray-300' : 'bg-red-600 text-white'} rounded-full shadow transition-opacity duration-200 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-500'}`}
+          onClick={handlePreviousPage}
+          disabled={offset === 0}
+          className={`px-6 py-2 ${offset === 0 ? 'bg-gray-300' : 'bg-red-600 text-white'} rounded-full shadow transition-opacity duration-200 ${offset === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-500'}`}
         >
           Anterior
         </button>
         <button
           onClick={handleNextPage}
-          disabled={currentPage === totalPages}
-          className={`px-4 py-2 ${currentPage === totalPages ? 'bg-gray-300' : 'bg-red-600 text-white'} rounded-full shadow transition-opacity duration-200 ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-500'}`}
+          disabled={characters.length < LIMIT}
+          className={`px-6 py-2 ${characters.length < LIMIT ? 'bg-gray-300' : 'bg-red-600 text-white'} rounded-full shadow transition-opacity duration-200 ${characters.length < LIMIT ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-500'}`}
         >
           Próximo
         </button>

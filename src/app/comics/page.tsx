@@ -1,38 +1,36 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link"; // Importando o Link
+import Link from "next/link";
+import Image from "next/image";
 import { getMarvelComics } from "../../services/api";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
-const LIMIT = 10; // Número de quadrinhos por página
+const LIMIT = 10;
 
 export default function ComicsPage() {
   const [comics, setComics] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [offset, setOffset] = useState(0); // Estado para a página atual
-  const [loading, setLoading] = useState(true); // Estado de carregamento
+  const [offset, setOffset] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchComics = async (term: string) => {
-      setLoading(true); // Inicia o carregamento
+      setLoading(true);
       try {
         const data = await getMarvelComics(term, offset, LIMIT);
         setComics(data.data.results);
       } catch (error) {
         console.error(error);
       } finally {
-        setLoading(false); // Finaliza o carregamento
+        setLoading(false);
       }
     };
 
-    fetchComics(searchTerm || "avengers"); // Usando 'avengers' como valor padrão
-  }, [searchTerm, offset]); // Adiciona offset na dependência
+    fetchComics(searchTerm || "avengers");
+  }, [searchTerm, offset]);
 
-  // Função para lidar com a busca
-  const handleSearch = (term: string) => {
-    setSearchTerm(term);
-    setOffset(0); // Reseta o offset ao buscar
-  };
 
   // Funções de paginação
   const handleNextPage = () => {
@@ -51,25 +49,30 @@ export default function ComicsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {comics.map((comic) => (
-            <Link key={comic.id} href={`/comics/${comic.id}`} passHref>
-              <div className="bg-white shadow-lg rounded-lg overflow-hidden transition-shadow duration-200 hover:shadow-xl">
-                <img
-                  src={`${comic.thumbnail.path}.${comic.thumbnail.extension}`}
-                  alt={comic.title}
-                  className="w-full h-48 object-cover rounded-t-lg" // Tamanho fixo e bordas arredondadas
-                />
-                <div className="p-4">
-                  <h2 className="font-bold text-center">{comic.title}</h2>
-                  <p className="h-16 overflow-hidden text-ellipsis"> {/* Tamanho fixo para a descrição */}
-                    {comic.description || "Descrição não disponível."}
-                  </p>
-                </div>
+            <Card key={comic.id} className="rounded-lg shadow-md overflow-hidden transition-shadow duration-200 hover:shadow-xl">
+              <Image
+                src={`${comic.thumbnail.path}.${comic.thumbnail.extension}`}
+                alt={comic.title}
+                width={300}
+                height={400}
+                className="w-full h-48 object-cover rounded-t-lg"
+              />
+              <div className="p-4">
+                <h2 className="text-xl font-bold text-center">{comic.title}</h2>
+                <p className="text-gray-600 h-16 overflow-hidden text-ellipsis">
+                  {comic.description || "Descrição não disponível."}
+                </p>
+                <Link href={`/comics/${comic.id}`} passHref>
+                  <Button variant="outline" className="w-full mt-4 rounded-full">
+                    Saiba Mais
+                  </Button>
+                </Link>
               </div>
-            </Link>
+            </Card>
           ))}
         </div>
       )}
-      <div className="flex justify-between mt-4">
+      <div className="flex justify-between mt-8">
         <button
           onClick={handlePreviousPage}
           disabled={offset === 0}
