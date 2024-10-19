@@ -1,6 +1,6 @@
 {
-  "name": "meu-projeto-filmes",
-  "version": "0.1.0",
+  "name": "marvel-comics",
+  "version": "1.1.5",
   "private": true,
   "scripts": {
     "dev": "next dev",

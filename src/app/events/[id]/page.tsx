@@ -2,6 +2,49 @@ import { getEventDetails } from "../../../services/api";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
+// Definições de interfaces
+interface ComicItem {
+  name: string;
+  resourceURI: string; // Adicione outros campos se necessário
+}
+
+interface CharacterItem {
+  name: string;
+  resourceURI: string; // Adicione outros campos se necessário
+}
+
+interface StoryItem {
+  name: string;
+  resourceURI: string; // Adicione outros campos se necessário
+}
+
+interface SeriesItem {
+  name: string;
+  resourceURI: string; // Adicione outros campos se necessário
+}
+
+interface EventData {
+  title: string;
+  description?: string;
+  thumbnail: {
+    path: string;
+    extension: string;
+  };
+  comics: {
+    items: ComicItem[];
+  };
+  characters: {
+    items: CharacterItem[];
+  };
+  stories: {
+    items: StoryItem[];
+  };
+  series: {
+    items: SeriesItem[];
+  };
+  urls: { url: string }[];
+}
+
 interface EventPageProps {
   params: { id: string };
 }
@@ -10,7 +53,7 @@ export default async function EventPage({ params }: EventPageProps) {
   console.log("Componente EventPage foi renderizado");
   console.log("Parâmetros recebidos:", params);
 
-  let eventData;
+  let eventData: EventData | undefined;
 
   try {
     const event = await getEventDetails(params.id); // Busca os detalhes do evento
@@ -52,27 +95,25 @@ export default async function EventPage({ params }: EventPageProps) {
           <p className="text-gray-600">
             <strong>Comics:</strong>{" "}
             {eventData.comics.items.length > 0
-              ? eventData.comics.items.map((comic) => comic.name).join(", ")
+              ? eventData.comics.items.map((comic: ComicItem) => comic.name).join(", ")
               : "Não disponível."}
           </p>
           <p className="text-gray-600">
             <strong>Personagens:</strong>{" "}
             {eventData.characters.items.length > 0
-              ? eventData.characters.items
-                  .map((character) => character.name)
-                  .join(", ")
+              ? eventData.characters.items.map((character: CharacterItem) => character.name).join(", ")
               : "Não disponível."}
           </p>
           <p className="text-gray-600">
             <strong>Histórias:</strong>{" "}
             {eventData.stories.items.length > 0
-              ? eventData.stories.items.map((story) => story.name).join(", ")
+              ? eventData.stories.items.map((story: StoryItem) => story.name).join(", ")
               : "Não disponível."}
           </p>
           <p className="text-gray-600">
             <strong>Séries:</strong>{" "}
             {eventData.series.items.length > 0
-              ? eventData.series.items.map((series) => series.name).join(", ")
+              ? eventData.series.items.map((series: SeriesItem) => series.name).join(", ")
               : "Não disponível."}
           </p>
         </div>

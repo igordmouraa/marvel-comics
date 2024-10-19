@@ -2,6 +2,41 @@ import { getComicDetails } from "../../../services/api";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
+// Definições de interfaces
+interface CreatorItem {
+  name: string;
+  role: string;
+}
+
+interface CharacterItem {
+  name: string;
+  resourceURI: string; // Adicione outros campos se necessário
+}
+
+interface DateItem {
+  type: string;
+  date: string;
+}
+
+interface ComicData {
+  title: string;
+  description?: string;
+  thumbnail: {
+    path: string;
+    extension: string;
+  };
+  issueNumber?: number;
+  dates: DateItem[];
+  format?: string;
+  creators: {
+    items: CreatorItem[];
+  };
+  characters: {
+    items: CharacterItem[];
+  };
+  urls: { url: string }[];
+}
+
 interface ComicPageProps {
   params: { id: string };
 }
@@ -10,7 +45,7 @@ export default async function ComicPage({ params }: ComicPageProps) {
   console.log("Componente ComicPage foi renderizado");
   console.log("Parâmetros recebidos:", params);
 
-  let comicData;
+  let comicData: ComicData | undefined;
 
   try {
     const comic = await getComicDetails(params.id);
@@ -26,7 +61,6 @@ export default async function ComicPage({ params }: ComicPageProps) {
     notFound();
     return;
   }
-
 
   if (!comicData) {
     return <div>Carregando...</div>;
@@ -52,7 +86,7 @@ export default async function ComicPage({ params }: ComicPageProps) {
             <strong>Número da Edição:</strong> {comicData.issueNumber || "Não disponível."}
           </p>
           <p className="text-gray-600">
-            <strong>Data de Publicação:</strong> {comicData.dates.find(date => date.type === 'onsaleDate')?.date || "Data não disponível."}
+            <strong>Data de Publicação:</strong> {comicData.dates.find((date: DateItem) => date.type === 'onsaleDate')?.date || "Data não disponível."}
           </p>
           <p className="text-gray-600">
             <strong>Formato:</strong> {comicData.format || "Formato não disponível."}
@@ -60,14 +94,14 @@ export default async function ComicPage({ params }: ComicPageProps) {
           <p className="text-gray-600">
             <strong>Escritores:</strong>{" "}
             {comicData.creators.items
-              .filter(creator => creator.role === 'writer')
-              .map(creator => creator.name)
+              .filter((creator: CreatorItem) => creator.role === 'writer')
+              .map((creator: CreatorItem) => creator.name)
               .join(", ") || "Não disponível."}
           </p>
           <p className="text-gray-600">
             <strong>Personagens:</strong>{" "}
             {comicData.characters.items.length
-              ? comicData.characters.items.map((character) => character.name).join(", ")
+              ? comicData.characters.items.map((character: CharacterItem) => character.name).join(", ")
               : "Personagens não disponíveis."}
           </p>
         </div>
