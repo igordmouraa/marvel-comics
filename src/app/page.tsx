@@ -1,100 +1,116 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { getMarvelComics } from "../services/api"; // Certifique-se de que o caminho está correto
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+
+const LIMIT = 3; // Definindo o limite para 3 quadrinhos
+
+export default function HomePage() {
+  const [comics, setComics] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true); // Estado de carregamento
+
+  useEffect(() => {
+    const fetchComics = async () => {
+      setLoading(true); // Inicia o carregamento
+      try {
+        const data = await getMarvelComics("avengers", 0, LIMIT); // Usando 'avengers' como valor padrão
+        setComics(data.data.results);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false); // Finaliza o carregamento
+      }
+    };
+
+    fetchComics(); // Chama a função para buscar os quadrinhos
+  }, []); // A dependência vazia garante que a busca seja feita apenas uma vez ao montar o componente
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="flex min-h-screen flex-col bg-gray-50">
+      {/* Hero Section */}
+      <div className="flex flex-col items-center justify-center text-center py-20 bg-gradient-to-r from-red-500 to-red-700 rounded-b-2xl">
+        <h1 className="text-5xl font-bold text-white mb-4">Bem-vindo ao Marvel Comics</h1>
+        <p className="text-lg text-gray-200 mb-6">
+          Descubra quadrinhos e muito mais sobre o universo Marvel.
+        </p>
+        <Link
+          href="/comics"
+          className="bg-white text-red-500 py-3 px-6 rounded-full shadow-md hover:bg-gray-100 transition"
+        >
+          Ver Quadrinhos
+        </Link>
+      </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      {/* Features Section */}
+      <div className="max-w-7xl mx-auto px-4 py-16">
+        <h2 className="text-3xl font-bold text-center mb-8">Por que escolher a Marvel?</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h3 className="text-xl font-semibold mb-2">Histórias Incríveis</h3>
+            <p className="text-gray-600">Mergulhe em narrativas épicas e emocionantes que vão te prender.</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h3 className="text-xl font-semibold mb-2">Personagens Memoráveis</h3>
+            <p className="text-gray-600">Conheça heróis e vilões que se tornaram ícones da cultura pop.</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h3 className="text-xl font-semibold mb-2">Arte Impressionante</h3>
+            <p className="text-gray-600">Aprecie ilustrações que trazem as histórias à vida de forma vibrante.</p>
+          </div>
         </div>
+      </div>
+
+      {/* Comics Section */}
+      <main className="max-w-7xl mx-auto px-4 py-16">
+        <h2 className="text-3xl font-bold text-center mb-8">Quadrinhos em Destaque</h2>
+        {loading ? (
+          <p className="text-center">Carregando quadrinhos...</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {comics.map((comic) => (
+              <Card key={comic.id} className="rounded-lg shadow-md">
+                <img
+                  src={`${comic.thumbnail.path}.${comic.thumbnail.extension}`}
+                  alt={comic.title}
+                  className="rounded-t-lg h-48 w-full object-cover"
+                />
+                <div className="p-4">
+                  <h3 className="text-xl font-bold">{comic.title}</h3>
+                  <p className="text-gray-600 mb-2">{comic.description || "Descrição não disponível."}</p>
+                  <Link href={`/comics/${comic.id}`}>
+                    <Button variant="outline" className="rounded-full">
+                      Saiba Mais
+                    </Button>
+                  </Link>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      {/* Testimonials Section */}
+      <div className="mx-auto max-w-5xl px-4 py-16">
+        <h2 className="text-3xl font-bold text-center mb-8">O que nossos fãs dizem</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h3 className="font-semibold">Cliente Satisfeito</h3>
+            <p className="text-gray-600 mb-4">"A Marvel sempre traz histórias que me emocionam e me fazem sonhar!"</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h3 className="font-semibold">Outro Fã Feliz</h3>
+            <p className="text-gray-600 mb-4">"Os quadrinhos da Marvel são a minha forma favorita de entretenimento!"</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer Section */}
+      <footer className="mt-10 text-center">
+        <p className="text-gray-500">© 2024 Marvel Comics. Todos os direitos reservados.</p>
       </footer>
     </div>
   );
