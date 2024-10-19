@@ -1,5 +1,6 @@
 import { getComicDetails } from "../../../services/api";
 import Image from "next/image";
+import Head from 'next/head';
 import { notFound } from "next/navigation";
 
 // Definições de interfaces
@@ -68,6 +69,9 @@ export default async function ComicPage({ params }: ComicPageProps) {
 
   return (
     <div className="container mx-auto px-4 py-6">
+      <Head>
+        <title>{comicData.title} | Marvel Comics</title>
+      </Head>
       <h1 className="text-4xl font-bold mb-4 text-center">{comicData.title}</h1>
       <div className="flex flex-col md:flex-row mb-6">
         <Image

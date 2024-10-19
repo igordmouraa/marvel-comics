@@ -1,5 +1,6 @@
-import { getEventDetails } from "../../../services/api"; 
+import { getEventDetails } from "../../../services/api";
 import Image from "next/image";
+import Head from "next/head";
 import { notFound } from "next/navigation";
 
 // Definições de interfaces
@@ -78,6 +79,9 @@ export default async function EventPage({ params }: EventPageProps) {
 
   return (
     <div className="container mx-auto px-4 py-6">
+      <Head>
+        <title>{eventData.title} | Marvel Comics</title>
+      </Head>
       <h1 className="text-4xl font-bold mb-4 text-center">{eventData.title}</h1>
       <div className="flex flex-col md:flex-row items-center mb-6">
         <Image
@@ -95,25 +99,33 @@ export default async function EventPage({ params }: EventPageProps) {
           <p className="text-gray-600">
             <strong>Comics:</strong>{" "}
             {eventData.comics.items.length > 0
-              ? eventData.comics.items.map((comic: ComicItem) => comic.name).join(", ")
+              ? eventData.comics.items
+                  .map((comic: ComicItem) => comic.name)
+                  .join(", ")
               : "Não disponível."}
           </p>
           <p className="text-gray-600">
             <strong>Personagens:</strong>{" "}
             {eventData.characters.items.length > 0
-              ? eventData.characters.items.map((character: CharacterItem) => character.name).join(", ")
+              ? eventData.characters.items
+                  .map((character: CharacterItem) => character.name)
+                  .join(", ")
               : "Não disponível."}
           </p>
           <p className="text-gray-600">
             <strong>Histórias:</strong>{" "}
             {eventData.stories.items.length > 0
-              ? eventData.stories.items.map((story: StoryItem) => story.name).join(", ")
+              ? eventData.stories.items
+                  .map((story: StoryItem) => story.name)
+                  .join(", ")
               : "Não disponível."}
           </p>
           <p className="text-gray-600">
             <strong>Séries:</strong>{" "}
             {eventData.series.items.length > 0
-              ? eventData.series.items.map((series: SeriesItem) => series.name).join(", ")
+              ? eventData.series.items
+                  .map((series: SeriesItem) => series.name)
+                  .join(", ")
               : "Não disponível."}
           </p>
         </div>

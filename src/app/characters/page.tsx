@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import Head from 'next/head';
 import { getMarvelCharacters } from "../../services/api"; 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -51,6 +52,9 @@ export default function CharactersPage() {
 
   return (
     <div className="container mx-auto px-4 py-6">
+      <Head>
+        <title>Marvel Comics | Personagens</title>
+      </Head>
       <h1 className="text-3xl font-bold mb-6 text-center">Personagens da Marvel</h1>
       {loading ? (
         <p className="text-center">Carregando...</p>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import Head from 'next/head';
 import { getMarvelEvents } from "../../services/api";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -52,6 +53,9 @@ export default function EventsPage() {
 
   return (
     <div className="container mx-auto px-4 py-6">
+        <Head>
+            <title>Marvel Comics | Eventos</title>
+        </Head>
       <h1 className="text-3xl font-bold mb-6 text-center">Eventos da Marvel</h1>
       {loading ? (
         <p className="text-center">Carregando...</p>

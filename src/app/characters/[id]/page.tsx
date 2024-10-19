@@ -1,5 +1,6 @@
 import { getCharacterDetails } from "../../../services/api";
 import Image from "next/image";
+import Head from 'next/head';
 import { notFound } from "next/navigation";
 
 // Definições de interfaces
@@ -78,7 +79,12 @@ export default async function CharacterPage({ params }: CharacterPageProps) {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <h1 className="text-4xl font-bold mb-4 text-center">{characterData.name}</h1>
+      <Head>
+        <title>{characterData.name} | Marvel Comics</title>
+      </Head>
+      <h1 className="text-4xl font-bold mb-4 text-center">
+        {characterData.name}
+      </h1>
       <div className="flex flex-col md:flex-row items-center mb-6">
         <Image
           src={`${characterData.thumbnail.path}.${characterData.thumbnail.extension}`}
@@ -93,27 +99,35 @@ export default async function CharacterPage({ params }: CharacterPageProps) {
           </p>
           <h2 className="text-xl font-semibold">Informações:</h2>
           <p className="text-gray-600">
-            <strong>Comics:</strong> {" "}
+            <strong>Comics:</strong>{" "}
             {characterData.comics.items.length > 0
-              ? characterData.comics.items.map((comic: ComicItem) => comic.name).join(", ")
+              ? characterData.comics.items
+                  .map((comic: ComicItem) => comic.name)
+                  .join(", ")
               : "Não disponível."}
           </p>
           <p className="text-gray-600">
-            <strong>Histórias:</strong> {" "}
+            <strong>Histórias:</strong>{" "}
             {characterData.stories.items.length > 0
-              ? characterData.stories.items.map((story: StoryItem) => story.name).join(", ")
+              ? characterData.stories.items
+                  .map((story: StoryItem) => story.name)
+                  .join(", ")
               : "Não disponível."}
           </p>
           <p className="text-gray-600">
-            <strong>Eventos:</strong> {" "}
+            <strong>Eventos:</strong>{" "}
             {characterData.events.items.length > 0
-              ? characterData.events.items.map((event: EventItem) => event.name).join(", ")
+              ? characterData.events.items
+                  .map((event: EventItem) => event.name)
+                  .join(", ")
               : "Não disponível."}
           </p>
           <p className="text-gray-600">
-            <strong>Séries:</strong> {" "}
+            <strong>Séries:</strong>{" "}
             {characterData.series.items.length > 0
-              ? characterData.series.items.map((series: SeriesItem) => series.name).join(", ")
+              ? characterData.series.items
+                  .map((series: SeriesItem) => series.name)
+                  .join(", ")
               : "Não disponível."}
           </p>
         </div>

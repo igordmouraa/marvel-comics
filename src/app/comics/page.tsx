@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import Head from 'next/head';
 import { getMarvelComics } from "../../services/api";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -50,13 +51,21 @@ export default function ComicsPage() {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <h1 className="text-3xl font-bold mb-6 text-center">Quadrinhos da Marvel</h1>
+      <Head>
+        <title>Marvel Comics | Quadrinhos</title>
+      </Head>
+      <h1 className="text-3xl font-bold mb-6 text-center">
+        Quadrinhos da Marvel
+      </h1>
       {loading ? (
         <p className="text-center">Carregando...</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {comics.map((comic) => (
-            <Card key={comic.id} className="rounded-lg shadow-md overflow-hidden transition-shadow duration-200 hover:shadow-xl">
+            <Card
+              key={comic.id}
+              className="rounded-lg shadow-md overflow-hidden transition-shadow duration-200 hover:shadow-xl"
+            >
               <Image
                 src={`${comic.thumbnail.path}.${comic.thumbnail.extension}`}
                 alt={comic.title}
@@ -70,7 +79,10 @@ export default function ComicsPage() {
                   {comic.description || "Descrição não disponível."}
                 </p>
                 <Link href={`/comics/${comic.id}`} passHref>
-                  <Button variant="outline" className="w-full mt-4 rounded-full">
+                  <Button
+                    variant="outline"
+                    className="w-full mt-4 rounded-full"
+                  >
                     Saiba Mais
                   </Button>
                 </Link>
@@ -83,14 +95,24 @@ export default function ComicsPage() {
         <button
           onClick={handlePreviousPage}
           disabled={offset === 0}
-          className={`px-6 py-2 ${offset === 0 ? 'bg-gray-300' : 'bg-red-600 text-white'} rounded-full shadow transition-opacity duration-200 ${offset === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-500'}`}
+          className={`px-6 py-2 ${
+            offset === 0 ? "bg-gray-300" : "bg-red-600 text-white"
+          } rounded-full shadow transition-opacity duration-200 ${
+            offset === 0 ? "opacity-50 cursor-not-allowed" : "hover:bg-red-500"
+          }`}
         >
           Anterior
         </button>
         <button
           onClick={handleNextPage}
           disabled={comics.length < LIMIT}
-          className={`px-6 py-2 ${comics.length < LIMIT ? 'bg-gray-300' : 'bg-red-600 text-white'} rounded-full shadow transition-opacity duration-200 ${comics.length < LIMIT ? 'opacity-50 cursor-not-allowed' : 'hover:bg-red-500'}`}
+          className={`px-6 py-2 ${
+            comics.length < LIMIT ? "bg-gray-300" : "bg-red-600 text-white"
+          } rounded-full shadow transition-opacity duration-200 ${
+            comics.length < LIMIT
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:bg-red-500"
+          }`}
         >
           Próximo
         </button>
