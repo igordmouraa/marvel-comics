@@ -3,11 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { getMarvelCharacters } from "../../services/api";
+import { getMarvelCharacters } from "../../services/api"; 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
-// Definindo uma interface para o personagem
 interface Character {
   id: number;
   name: string;
@@ -18,30 +17,30 @@ interface Character {
   };
 }
 
-const LIMIT = 10;
+const LIMIT = 20; // Isso deve ser o mesmo que ITEMS_PER_PAGE na sua função de API.
 
 export default function CharactersPage() {
   const [characters, setCharacters] = useState<Character[]>([]);
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchCharacters = async (term: string) => {
-      setLoading(true);
-      try {
-        const data = await getMarvelCharacters(term, offset, LIMIT);
-        setCharacters(data.data.results);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchCharacters = async (page: number) => {
+    setLoading(true);
+    try {
+      const data = await getMarvelCharacters(page); // Passa apenas a página
+      setCharacters(data.data.results);
+    } catch (error) {
+      console.error("Erro ao buscar personagens:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchCharacters("avengers");
+  useEffect(() => {
+    const page = Math.floor(offset / LIMIT) + 1; // Calcula a página com base no offset
+    fetchCharacters(page);
   }, [offset]);
 
-  // Funções de paginação
   const handleNextPage = () => {
     setOffset((prev) => prev + LIMIT);
   };
