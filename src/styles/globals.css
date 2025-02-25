@@ -2,16 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Estilos personalizados */
-.container {
-  @apply max-w-7xl mx-auto p-6;
+@layer utilities {
+  /* Suporte para animações personalizadas */
+  .animate-marvelFloat {
+    animation: marvelFloat 20s linear infinite;
+  }
+
+  /* Gradientes personalizados */
+  .bg-marvel-red-gradient {
+    @apply bg-gradient-to-r from-red-600 to-red-800;
+  }
+
+  /* Tipografia */
+  .font-marvel-title {
+    @apply font-bold tracking-tighter;
+  }
+}
+
+@keyframes marvelFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  @apply w-2;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-red-50;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-red-500 rounded-full hover:bg-red-600 transition-colors;
+}
+
+/* Estilos base */
+body {
+  @apply bg-white text-gray-950 antialiased leading-relaxed;
+}
+
+h1, h2, h3 {
+  @apply font-marvel-title;
 }
 
 h1 {
-  @apply text-3xl font-bold text-center mb-8;
+  @apply text-4xl md:text-5xl lg:text-6xl;
 }
 
-html {
-  scroll-behavior: smooth;
+h2 {
+  @apply text-3xl md:text-4xl;
 }
-/* Remova a parte com .grid */
+
