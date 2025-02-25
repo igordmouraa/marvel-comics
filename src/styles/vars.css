@@ -1,0 +1,9 @@
+@layer base {
+    :root {
+        --font-inter: 'Inter';
+        --font-marvel: 'Marvel';
+
+        --background: 0 0% 100%;
+        --foreground: 222.2 84% 4.9%;
+    }
+}
