@@ -1,127 +1,161 @@
-// src/services/api.ts
-
 import CryptoJS from 'crypto-js';
 
-const publicKey = 'b6292eb9ef43f2eca040ebb1a464a08d'; // Substitua pela sua chave pública
-const privateKey = 'aea1cd381649acf90945cba5689f08c21b73ed39'; // Substitua pela sua chave privada
+const publicKey = 'b6292eb9ef43f2eca040ebb1a464a08d';
+const privateKey = 'aea1cd381649acf90945cba5689f08c21b73ed39';
+const API_BASE = 'https://gateway.marvel.com/v1/public';
 
-// Função para gerar o timestamp e o hash
+interface MarvelApiResponse<T> {
+    code: number;
+    status: string;
+    data: {
+        offset: number;
+        limit: number;
+        total: number;
+        count: number;
+        results: T[];
+    };
+}
+
+interface Thumbnail {
+    path: string;
+    extension: string;
+}
+
+interface Comic {
+    id: number;
+    title: string;
+    description?: string;
+    thumbnail: Thumbnail;
+    issueNumber?: number;
+    dates: { type: string; date: string }[];
+    creators: { items: { name: string; role: string }[] };
+    characters: { items: { name: string; resourceURI: string }[] };
+    urls: { type: string; url: string }[];
+}
+
+interface Character {
+    id: number;
+    name: string;
+    description?: string;
+    thumbnail: Thumbnail;
+    comics: { available: number; items: { name: string; resourceURI: string }[] };
+    events: { available: number; items: { name: string; resourceURI: string }[] };
+    series: { available: number; items: { name: string; resourceURI: string }[] };
+    stories: { available: number; items: { name: string; resourceURI: string }[] };
+    urls: { type: string; url: string }[];
+}
+
+interface Event {
+    id: number;
+    title: string;
+    description?: string;
+    thumbnail: Thumbnail;
+    start: string;
+    end: string;
+    comics: { available: number; items: { name: string; resourceURI: string }[] };
+    characters: { available: number; items: { name: string; resourceURI: string }[] };
+    stories: { available: number; items: { name: string; resourceURI: string }[] };
+    series: { available: number; items: { name: string; resourceURI: string }[] };
+    urls: { type: string; url: string }[];
+}
+
+class MarvelApiError extends Error {
+    constructor(public status: number, message: string) {
+        super(message);
+        this.name = 'MarvelApiError';
+    }
+}
+
+// Helpers
 const generateAuthParams = () => {
     const timestamp = Date.now().toString();
     const hash = CryptoJS.MD5(timestamp + privateKey + publicKey).toString();
     return { timestamp, hash };
 };
 
-// Função para buscar quadrinhos da Marvel com base em um termo de pesquisa
-export const getMarvelComics = async (searchTerm: string = 'avengers', offset: number = 0, limit: number = 10) => {
+const fetchMarvelData = async <T>(endpoint: string, params: Record<string, string> = {}) => {
     const { timestamp, hash } = generateAuthParams();
-    const baseUrl = 'https://gateway.marvel.com/v1/public/comics';
-    const url = `${baseUrl}?format=comic&title=${searchTerm}&orderBy=onsaleDate&ts=${timestamp}&apikey=${publicKey}&hash=${hash}&offset=${offset}&limit=${limit}`;
+    const url = new URL(`${API_BASE}/${endpoint}`);
+
+    const searchParams = new URLSearchParams({
+        ts: timestamp,
+        apikey: publicKey,
+        hash,
+        ...params
+    });
+
+    url.search = searchParams.toString();
 
     try {
-        const response = await fetch(url);
+        const response = await fetch(url.toString());
+
         if (!response.ok) {
-            throw new Error(`Erro: ${response.status} ${response.statusText}`);
+            throw new MarvelApiError(response.status, `HTTP error! status: ${response.status}`);
         }
-        const data = await response.json();
+
+        const data: MarvelApiResponse<T> = await response.json();
         return data;
+
     } catch (error) {
-        console.error('Erro ao buscar dados da Marvel:', error);
-        throw error; // Lança o erro para que possa ser tratado onde a função é chamada
-    }
-};
-
-// Função para buscar detalhes de um quadrinho específico
-export const getComicDetails = async (id: string) => {
-    const { timestamp, hash } = generateAuthParams();
-    const baseUrl = `https://gateway.marvel.com/v1/public/comics/${id}`;
-    const url = `${baseUrl}?ts=${timestamp}&apikey=${publicKey}&hash=${hash}`;
-
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Erro: ${response.status} ${response.statusText}`);
-        }
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Erro ao buscar detalhes do quadrinho:', error);
-        throw error; // Lança o erro para que possa ser tratado onde a função é chamada
-    }
-};
-
-export const getMarvelCharacters = async (page: number) => {
-    const { timestamp, hash } = generateAuthParams();
-    const baseUrl = 'https://gateway.marvel.com/v1/public/characters';
-    const ITEMS_PER_PAGE = 20;
-    const url = `${baseUrl}?ts=${timestamp}&apikey=${publicKey}&hash=${hash}&limit=${ITEMS_PER_PAGE}&offset=${(page - 1) * ITEMS_PER_PAGE}`;
-
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Erro: ${response.status} ${response.statusText}`);
-        }
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Erro ao buscar dados dos personagens:', error);
-        throw error; // Lança o erro para que possa ser tratado onde a função é chamada
-    }
-};
-
-export const getCharacterDetails = async (id: string) => {
-    const { timestamp, hash } = generateAuthParams();
-    const baseUrl = `https://gateway.marvel.com/v1/public/characters/${id}`;
-    const url = `${baseUrl}?ts=${timestamp}&apikey=${publicKey}&hash=${hash}`;
-
-    console.log("URL da API:", url); // Logando a URL para verificar se está correta
-
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Erro: ${response.status} ${response.statusText}`);
-        }
-        const data = await response.json();
-        console.log("Dados recebidos da API:", data); // Logando os dados recebidos
-        return data;
-    } catch (error) {
-        console.error('Erro ao buscar detalhes do personagem:', error);
-        throw error; // Lança o erro para que possa ser tratado onde a função é chamada
-    }
-};
-
-export const getMarvelEvents = async (offset: number = 0, limit: number = 10) => {
-    const { timestamp, hash } = generateAuthParams();
-    const baseUrl = 'https://gateway.marvel.com/v1/public/events';
-    const url = `${baseUrl}?ts=${timestamp}&apikey=${publicKey}&hash=${hash}&offset=${offset}&limit=${limit}`;
-
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Erro: ${response.status} ${response.statusText}`);
-        }
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Erro ao buscar eventos da Marvel:', error);
+        console.error(`Marvel API request failed: ${url.toString()}`, error);
         throw error;
     }
 };
 
-export const getEventDetails = async (id: string) => {
-    const { timestamp, hash } = generateAuthParams();
-    const baseUrl = `https://gateway.marvel.com/v1/public/events/${id}`;
-    const url = `${baseUrl}?ts=${timestamp}&apikey=${publicKey}&hash=${hash}`;
+// Funções da API
+export const getMarvelComics = async (
+    searchTerm: string = '',
+    offset: number = 0,
+    limit: number = 10
+) => {
+    const params: Record<string, string> = {
+        format: 'comic',
+        orderBy: 'onsaleDate',
+        offset: offset.toString(),
+        limit: limit.toString()
+    };
 
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Erro: ${response.status} ${response.statusText}`);
-        }
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Erro ao buscar detalhes do evento:', error);
-        throw error; // Lança o erro para que possa ser tratado onde a função é chamada
-    }
+    if (searchTerm) params.titleStartsWith = searchTerm;
+
+    return fetchMarvelData<Comic>('comics', params);
+};
+
+export const getComicDetails = async (id: string) => {
+    return fetchMarvelData<Comic>(`comics/${id}`);
+};
+
+export const getMarvelCharacters = async (
+    searchTerm: string = '',
+    offset: number = 0,
+    limit: number = 20
+) => {
+    const params: Record<string, string> = {
+        offset: offset.toString(),
+        limit: limit.toString()
+    };
+
+    if (searchTerm) params.nameStartsWith = searchTerm;
+
+    return fetchMarvelData<Character>('characters', params);
+};
+
+export const getCharacterDetails = async (id: string) => {
+    return fetchMarvelData<Character>(`characters/${id}`);
+};
+
+export const getMarvelEvents = async (
+    offset: number = 0,
+    limit: number = 10
+) => {
+    const params: Record<string, string> = {
+        offset: offset.toString(),
+        limit: limit.toString()
+    };
+
+
+    return fetchMarvelData<Event>('events', params);
+};
+
+export const getEventDetails = async (id: string) => {
+    return fetchMarvelData<Event>(`events/${id}`);
 };
